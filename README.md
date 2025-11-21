@@ -244,3 +244,32 @@ rm db.sqlite3
 Test deploy for Rollbar — 2025-11-07
 >>>>>>> d38f44a (test Rollbar deploy)
 Test deploy for Rollbar — 2025-11-07
+
+## Запуск через Docker Compose (dev)
+
+Этот способ запускает одновременно бэкенд (Django) и фронтенд (Parcel watch) в контейнерах. Работает на Windows и macOS — главное, чтобы Docker Desktop был установлен и запущен.
+
+1. Подготовьте переменные окружения (пример в `star_burger/.env`). Для локальной разработки достаточно:
+   ```
+   SECRET_KEY=dev-secret-key
+   DEBUG=True
+   ALLOWED_HOSTS=127.0.0.1,localhost,0.0.0.0
+   DATABASE_URL=sqlite:///db.sqlite3
+   YANDEX_GEOCODER_API_KEY=dummy-key
+   ```
+2. Запустите стек:
+   ```bash
+   docker compose up --build
+   ```
+   - Бэкенд слушает на `http://127.0.0.1:8000/`.
+   - Parcel dev-сервер доступен на `http://127.0.0.1:1234/`, а собранные бандлы отдаются Django из каталога `bundles/`, смонтированного с хоста.
+3. (Необязательно) Автозагрузка фикстур: выставьте `LOAD_FIXTURE_ON_START=1` в секции `backend` файла `docker-compose.yml`, чтобы при старте после миграций подгружался `data.json`.
+4. Остановить стек:
+   ```bash
+   docker compose down
+   ```
+   Добавьте флаг `-v`, если хотите удалить именованные тома (`node_modules`, `static_volume`, `media_volume`) и начать с чистого состояния.
+
+Примечания:
+- На macOS и Windows обязательно сначала запустите Docker Desktop и дождитесь, пока движок прогреется, иначе команда не подключится к демону.
+- Файл `.dockerignore` исключает временные каталоги и локальные окружения, чтобы сборка была быстрее.

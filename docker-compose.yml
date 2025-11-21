@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  backend:
+    build: .
+    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+    volumes:
+      - .:/app
+      - static_volume:/app/static
+      - media_volume:/app/media
+    ports:
+      - "8000:8000"
+    env_file:
+      - star_burger/.env
+    environment:
+      DJANGO_SETTINGS_MODULE: star_burger.settings
+      # Set to 1 to load data.json on container start (optional for fresh DBs)
+      # LOAD_FIXTURE_ON_START: "1"
+
+  frontend:
+    image: node:16
+    working_dir: /app
+    command: >
+      sh -c "npm install --include=dev && ./node_modules/.bin/parcel watch bundles-src/index.js --dist-dir bundles --public-url=./"
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    ports:
+      - "1234:1234"
+    environment:
+      NODE_ENV: development
+
+volumes:
+  node_modules:
+  static_volume:
+  media_volume:

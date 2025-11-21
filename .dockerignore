@@ -1,0 +1,16 @@
+.git
+.gitignore
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.log
+db.sqlite3
+venv
+env/
+*.env
+.venv
+.parcel-cache/
+node_modules/
+bundles/
+static/
+staticfiles/
