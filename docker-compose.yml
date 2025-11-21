@@ -1,24 +1,47 @@
 version: "3.9"
 
 services:
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: star_burger_prod
+      POSTGRES_USER: star_burger_user
+      POSTGRES_PASSWORD: Malina96
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db_dump.sql:/docker-entrypoint-initdb.d/db_dump.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U star_burger_user -d star_burger_prod"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   backend:
     build: .
     command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+    depends_on:
+      db:
+        condition: service_healthy
     volumes:
       - .:/app
       - static_volume:/app/static
-      - media_volume:/app/media
+      - ./media:/app/media
     ports:
       - "8000:8000"
     env_file:
       - star_burger/.env
     environment:
       DJANGO_SETTINGS_MODULE: star_burger.settings
+      DATABASE_URL: postgres://star_burger_user:Malina96@db:5432/star_burger_prod
+      DEBUG: "True"
+      ALLOWED_HOSTS: "*"
       # Set to 1 to load data.json on container start (optional for fresh DBs)
       # LOAD_FIXTURE_ON_START: "1"
 
   frontend:
-    image: node:16
+    image: node:20
     working_dir: /app
     command: >
       sh -c "npm install --include=dev && ./node_modules/.bin/parcel watch bundles-src/index.js --dist-dir bundles --public-url=./"
@@ -33,4 +56,4 @@ services:
 volumes:
   node_modules:
   static_volume:
-  media_volume:
+  postgres_data:
