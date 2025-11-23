@@ -20,7 +20,12 @@
 - Свободные порты: `8000` (backend), `1234` (Parcel), `5433` (Postgres на хосте).
 
 ### Шаги
-1. Создайте `star_burger/.env`, пример:
+1. Клонируйте репозиторий:
+   ```bash
+   git clone https://github.com/Evst404/Starburger-docker.git
+   cd Starburger-docker
+   ```
+2. Создайте `star_burger/.env`, пример:
    ```
    SECRET_KEY=dev-secret-key
    DEBUG=True
@@ -28,7 +33,7 @@
    DATABASE_URL=postgres://star_burger_user:Malina96@db:5432/star_burger_prod
    YANDEX_GEOCODER_API_KEY=your_yandex_api_key
    ```
-2. Запустите стек:
+3. Запустите стек:
    ```bash
    docker compose up --build
    ```
@@ -36,7 +41,7 @@
    - Менеджер: `http://127.0.0.1:8000/manager/`
    - Админка: `http://127.0.0.1:8000/admin/`
    - Parcel dev: `http://127.0.0.1:1234/`
-3. Остановить:
+4. Остановить:
    ```bash
    docker compose down
    ```
@@ -57,7 +62,11 @@ docker compose logs -f frontend                                # логи фро
 ## Деплой на сервер (Docker Compose)
 
 1. Установите Docker на сервере.
-2. Склонируйте репозиторий в `/opt/star-burger-docker`, положите прод `.env` в `star_burger/.env`, дамп БД в `db_dump.sql`, прод-медиа в `media/`.
+2. Склонируйте репозиторий в `/opt/star-burger-docker`:
+   ```bash
+   git clone https://github.com/Evst404/Starburger-docker.git /opt/star-burger-docker
+   ```
+   Положите прод `.env` в `star_burger/.env`, дамп БД в `db_dump.sql`, прод-медиа в `media/`.
 3. Поднимите стек:
    ```bash
    cd /opt/star-burger-docker
@@ -76,6 +85,17 @@ docker compose logs -f frontend                                # логи фро
    docker-compose exec -T frontend sh -c './node_modules/.bin/parcel build bundles-src/index.js --dist-dir bundles --public-url=./'
    sudo nginx -t && sudo systemctl reload nginx
    ```
+
+## Проверка работоспособности
+
+- Открыть публичный сайт: `https://evst404.ru` (или `http://evst404.ru`). В обычном профиле браузера может кешироваться старый HTTPS — если не открывается, попробуйте инкогнито или очистку HSTS/кэша.
+- Админка: `https://evst404.ru/admin/` (создайте суперюзера через `docker compose exec backend python manage.py createsuperuser`).
+- Панель менеджера: `https://evst404.ru/manager/`.
+- Проверка локально/на сервере напрямую:
+  - HTML: `curl -H 'Host: evst404.ru' http://127.0.0.1:8000/`
+  - Статика: `curl -I http://127.0.0.1/static/index.css`
+  - Статус контейнеров: `docker compose ps`
+- Проверка сохранности данных: `docker compose down && docker compose up -d --build` — заказы/медиа должны остаться (БД в томе `postgres_data`, медиа в каталоге `media/`).
 
 ## Цели проекта
 
