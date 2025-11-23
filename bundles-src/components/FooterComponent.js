@@ -10,7 +10,6 @@ const FooterComponent = props => {
     fontSize: "130%",
   }
 
-  // FIXME should be moved to backend db ?
   let email = 'office@star-burger.com';
   let phoneNumber = '+7 901 999-99-99';
   let address = 'г.Москва, Старый Арбарт, 66';

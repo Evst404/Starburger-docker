@@ -49,6 +49,29 @@
   docker compose logs -f frontend
   ```
 
+## Деплой на сервер (Docker Compose)
+
+1. Установите Docker на сервере.
+2. Скопируйте репозиторий в `/opt/star-burger-docker`, положите прод `.env` в `star_burger/.env`, продампы в `db_dump.sql`, медиа в `media/`.
+3. Запустите стек:
+   ```bash
+   cd /opt/star-burger-docker
+   docker-compose up -d --build
+   docker-compose exec -T backend python manage.py collectstatic --noinput
+   docker-compose exec -T frontend sh -c './node_modules/.bin/parcel build bundles-src/index.js --dist-dir bundles --public-url=./'
+   ```
+   - Бэкенд слушает `127.0.0.1:8000` (проксируется nginx).
+   - БД на `127.0.0.1:5433`, в томе `postgres_data`.
+4. Настройте nginx на прокси `http://127.0.0.1:8000/` и alias для `static/`, `bundles/`, `media/` из `/opt/star-burger-docker`.
+5. Обновление кода/стека:
+   ```bash
+   git pull
+   docker-compose up -d --build
+   docker-compose exec -T backend python manage.py collectstatic --noinput
+   docker-compose exec -T frontend sh -c './node_modules/.bin/parcel build bundles-src/index.js --dist-dir bundles --public-url=./'
+   sudo nginx -t && sudo systemctl reload nginx
+   ```
+
 ## Цели проекта
 
 Код написан в учебных целях — это урок в курсе по Python и веб-разработке на сайте [Devman](https://dvmn.org). За основу взят проект [FoodCart](https://github.com/Saibharath79/FoodCart).
