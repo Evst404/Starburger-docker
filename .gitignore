@@ -1,5 +1,7 @@
 bundles/**
 node_modules/
+frontend/node_modules/
+frontend/.parcel-cache/
 media/
 
 # Byte-compiled / optimized / DLL files
