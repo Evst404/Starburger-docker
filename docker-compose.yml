@@ -19,18 +19,17 @@ services:
 
   backend:
     build: .
+    working_dir: /app/backend
     command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
     depends_on:
       db:
         condition: service_healthy
     volumes:
-      - .:/app
-      - ./static:/app/static
-      - ./media:/app/media
+      - ./backend:/app/backend
     ports:
       - "127.0.0.1:8000:8000"
     env_file:
-      - star_burger/.env
+      - backend/star_burger/.env
     environment:
       DJANGO_SETTINGS_MODULE: star_burger.settings
       DATABASE_URL: postgres://star_burger_user:Malina96@db:5432/star_burger_prod
